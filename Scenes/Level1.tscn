@@ -35,13 +35,15 @@ script = null
 
 [node name="LilDemon" parent="." index="2"]
 position = Vector2( 782.274, 497.331 )
-scale = Vector2( 5, 5 )
 floating_speed = 300
 
 [node name="portal" type="Node2D" parent="." index="3"]
-position = Vector2( 1216.75, 596.027 )
+position = Vector2( 1203.27, 161.518 )
 scale = Vector2( 5, 5 )
 script = ExtResource( 2 )
+__meta__ = {
+"_edit_group_": true
+}
 next_level = ExtResource( 4 )
 
 [node name="Area2D" type="Area2D" parent="portal" index="0"]

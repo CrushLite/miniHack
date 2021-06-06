@@ -10,16 +10,47 @@ export var floating_speed = 500
 
 var motion = Vector2()
 var motion_previous = Vector2()
+var is_on_wall = false
+
 
 func _physics_process(delta):
-	motion.y += GRAVITY
+	if $RayCastLeft.is_colliding():
+		if not is_on_wall:
+			motion.y = 0
+		is_on_wall = "left"
+		
+	elif $RayCastRight.is_colliding():
+		if not is_on_wall:
+			motion.y = 0
+		is_on_wall = "right"
+	else:
+		is_on_wall = false
+	
+	if is_on_wall:
+		if motion.y > 0:
+			motion.y += GRAVITY*0.01
+		else:
+			motion.y += GRAVITY
+		if Input.is_action_just_pressed("ui_up"):
+			motion.y = JUMP_HEIGHT
+			if is_on_wall == "right":
+				motion.x -= SPEED*10
+				print("RIGHT")
+			elif is_on_wall == "left":
+				motion.x += SPEED*10
+				
+		# ADD: New wall animation
+	else:
+		motion.y += GRAVITY
+	
+	
 	
 	
 	if Input.is_action_pressed("ui_left"):
-		motion.x = -SPEED
+		motion.x -=SPEED
 	elif Input.is_action_pressed("ui_right"):
-		motion.x = SPEED
-	else:
+		motion.x +=SPEED
+	elif is_on_floor():
 		motion.x = 0
 	
 	
@@ -29,7 +60,6 @@ func _physics_process(delta):
 #		var r = rand_range(0.6,1.2)
 #		motion.y = JUMP_HEIGHT * r
 	
-	
 #	print("%s %s" % [external_forces, motion])
 #	for i in range(external_forces.size(), -1, -1):
 #		print(i)
@@ -37,6 +67,7 @@ func _physics_process(delta):
 #		motion += force
 #	external_forces = []
 	
+	motion.x = clamp(motion.x, -SPEED, SPEED)
 	motion_previous = motion
 #	motion = move_slide_and_crush(motion, UP, false)
 	motion = move_and_slide(motion, UP, false)
@@ -58,6 +89,8 @@ func _handle_animations():
 			$AnimatedSprite.play("Idle")
 		if motion.length() > 0:
 			$AnimatedSprite.play("Walk")
+	elif is_on_wall:
+		$AnimatedSprite.play("Wall")
 	else:
 		if abs(motion.y) < floating_speed:
 			$AnimatedSprite.play("Floating?")
