@@ -1,12 +1,14 @@
-[gd_scene load_steps=17 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Textures/DB_Idle-Sheet.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/LilDemon.gd" type="Script" id=2]
 [ext_resource path="res://Textures/DB_Walk-Sheet.png" type="Texture" id=3]
+[ext_resource path="res://Textures/DB_Air2.png" type="Texture" id=4]
+[ext_resource path="res://Textures/DB_Air3.png" type="Texture" id=5]
+[ext_resource path="res://Textures/DB_Air1.png" type="Texture" id=6]
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 18.8326
-height = 22.8253
+[sub_resource type="RectangleShape2D" id=14]
+extents = Vector2( 16.9844, 28.5908 )
 
 [sub_resource type="AtlasTexture" id=2]
 flags = 4
@@ -37,6 +39,11 @@ region = Rect2( 256, 0, 64, 64 )
 flags = 4
 atlas = ExtResource( 1 )
 region = Rect2( 320, 0, 64, 64 )
+
+[sub_resource type="AtlasTexture" id=15]
+flags = 4
+atlas = ExtResource( 6 )
+region = Rect2( 0, 0, 64, 64 )
 
 [sub_resource type="AtlasTexture" id=9]
 flags = 4
@@ -70,10 +77,25 @@ animations = [ {
 "name": "Idle",
 "speed": 5.0
 }, {
+"frames": [ SubResource( 15 ) ],
+"loop": false,
+"name": "Launching",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 5 ) ],
+"loop": true,
+"name": "Falling",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 4 ) ],
+"loop": true,
+"name": "Floating?",
+"speed": 5.0
+}, {
 "frames": [ SubResource( 9 ), SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ) ],
 "loop": true,
 "name": "Walk",
-"speed": 5.0
+"speed": 12.0
 } ]
 
 [node name="LilDemon" type="KinematicBody2D" groups=[
@@ -83,10 +105,10 @@ script = ExtResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( -0.259949, 3.09473 )
-shape = SubResource( 1 )
+shape = SubResource( 14 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 8 )
 animation = "Walk"
-frame = 4
+frame = 3
 playing = true

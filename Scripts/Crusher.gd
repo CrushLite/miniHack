@@ -9,6 +9,7 @@ var velocity = Vector2.ZERO
 export (int, 0, 200) var push = 70
 
 func _ready():
+	$KinematicBody2D.position = $Path2D/PathFollow2D.position
 	patrol_points = $Path2D.curve.get_baked_points()
 
 func _physics_process(delta):
@@ -24,15 +25,33 @@ func _physics_process(delta):
 		# TODO/BUG: when the player is moving into the platform he can fight it
 		$KinematicBody2D.move_and_collide(velocity * delta)
 #		$KinematicBody2D.position += velocity * delta
-		
 	else:
-		# move the colliding object along the normal based on collision.remainder
+#		# move the colliding object along the normal based on collision.remainder
 		var player = collision.collider
+			
 #		print(player.name)
 		var force = collision.normal * collision.remainder.abs()
 #		print(force, collision.normal)
-		player.position += -force
-		$KinematicBody2D.position += collision.travel + collision.remainder
+		
+		# BUG: This code will kill the player if he is standing on top of a platform
+		#      and also collides with a wall.
+		
+		if player is KinematicBody2D:
+			
+			var player_collision = player.move_and_collide(-force)
+			if player_collision:
+				var dot_prod = collision.normal.dot(player_collision.normal)
+				if dot_prod == -1:
+					# we've smooshed
+					print("Collided: %s %s %s" % [player_collision.normal, collision.normal, dot_prod])
+					player.die()
+#			player.position += -force
+			
+			$KinematicBody2D.position += collision.travel + collision.remainder
+#			$KinematicBody2D.move_and_collide(velocity * delta)
+		else: # like the tilemap
+			set_process(false)
+			pass
 #		$KinematicBody2D.move_and_collide(velocity * delta)
 #		collision.collider.position += collision.normal * collision.remainder
 	

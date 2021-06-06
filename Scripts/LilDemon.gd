@@ -1,20 +1,15 @@
 extends KinematicBody2D
-"""
-Basic platformer control from Heartbeast 
-for the purpose of showing Squash and Stretch
-	https://www.youtube.com/watch?v=wETY5_9kFtA
-Other platformers are available
-"""
+#extends CrushableBody2D
 
 const UP = Vector2(0, -1)
 const GRAVITY = 35
-const SPEED = 700
-const JUMP_HEIGHT = -1200
+const SPEED = 500
+const JUMP_HEIGHT = -800
+
+export var floating_speed = 500
 
 var motion = Vector2()
 var motion_previous = Vector2()
-
-var external_forces = []
 
 func _physics_process(delta):
 	motion.y += GRAVITY
@@ -38,21 +33,42 @@ func _physics_process(delta):
 #	print("%s %s" % [external_forces, motion])
 #	for i in range(external_forces.size(), -1, -1):
 #		print(i)
-	for force in external_forces:
-		motion += force
-	external_forces = []
+#	for force in external_forces:
+#		motion += force
+#	external_forces = []
 	
 	motion_previous = motion
+#	motion = move_slide_and_crush(motion, UP, false)
 	motion = move_and_slide(motion, UP, false)
-
+	
 	_handle_animations()
+
+
+func crushed():
+	position = Vector2(400,400)
+
+func die():
+	position = Vector2(400,400)
+#	queue_free()
 
 func _handle_animations():
 	
-	if motion.length() == 0:
-		$AnimatedSprite.play("Idle")
-	if motion.length() > 0:
-		$AnimatedSprite.play("Walk")
+	if is_on_floor():
+		if motion.length() == 0:
+			$AnimatedSprite.play("Idle")
+		if motion.length() > 0:
+			$AnimatedSprite.play("Walk")
+	else:
+		if abs(motion.y) < floating_speed:
+			$AnimatedSprite.play("Floating?")
+		else:
+			if motion.y < 0: # rising
+				$AnimatedSprite.play("Launching")
+			else:
+				$AnimatedSprite.play("Falling")
+				
+				
+	
 	if motion.x < 0:
 		$AnimatedSprite.flip_h = true
 	if motion.x > 0:
